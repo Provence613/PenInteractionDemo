@@ -1,0 +1,251 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>$1 Recognizer</title>
+	<!-- <script type="text/javascript" src="canvas.text.js"></script> -->
+	<!-- <script type="text/javascript" src="./faces/gentilis-normal-normal.js"></script> -->
+	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="dollar.js"></script>
+	<script type="text/javascript"><!--
+	    //
+		// Startup
+		//
+		var _isDown, _points, _r, _g, _rc;
+		function onLoadEvent()
+		{
+			_points = new Array();
+			_r = new DollarRecognizer();
+
+			var canvas = document.getElementById('myCanvas');
+			_g = canvas.getContext('2d');
+			_g.fillStyle = "rgb(0,0,225)";
+			_g.strokeStyle = "rgb(0,0,225)";
+			_g.lineWidth = 3;
+			_g.font = "16px Gentilis";
+			_rc = getCanvasRect(canvas); // canvas rect on page
+			_g.fillStyle = "rgb(255,255,136)";
+			_g.fillRect(0, 0, _rc.width, 20);
+
+			_isDown = false;
+		}
+		function getCanvasRect(canvas)
+		{
+			var w = canvas.width;
+			var h = canvas.height;
+
+			var cx = canvas.offsetLeft;
+			var cy = canvas.offsetTop;
+			while (canvas.offsetParent != null)
+			{
+				canvas = canvas.offsetParent;
+				cx += canvas.offsetLeft;
+				cy += canvas.offsetTop;
+			}
+			return {x: cx, y: cy, width: w, height: h};
+		}
+		function getScrollX()
+		{
+			var scrollX = $(window).scrollLeft();
+			return scrollX;
+		}
+		function getScrollY()
+		{
+			var scrollY = $(window).scrollTop();
+			return scrollY;
+		}
+		//
+		// Mouse Events
+		//
+		function mouseDownEvent(x, y, button)
+		{
+			document.onselectstart = function() { return false; } // disable drag-select
+			document.onmousedown = function() { return false; } // disable drag-select
+			if (button <= 1)
+			{
+				_isDown = true;
+				x -= _rc.x - getScrollX();
+				y -= _rc.y - getScrollY();
+				if (_points.length > 0)
+					_g.clearRect(0, 0, _rc.width, _rc.height);
+				_points.length = 1; // clear
+				_points[0] = new Point(x, y);
+				drawText("Recording unistroke...");
+				_g.fillRect(x - 4, y - 3, 9, 9);
+			}
+			else if (button == 2)
+			{
+				drawText("Recognizing gesture...");
+			}
+		}
+		function mouseMoveEvent(x, y, button)
+		{
+			if (_isDown)
+			{
+				x -= _rc.x - getScrollX();
+				y -= _rc.y - getScrollY();
+				_points[_points.length] = new Point(x, y); // append
+				drawConnectedPoint(_points.length - 2, _points.length - 1);
+			}
+		}
+		function mouseUpEvent(x, y, button)
+		{
+			document.onselectstart = function() { return true; } // enable drag-select
+			document.onmousedown = function() { return true; } // enable drag-select
+			if (_isDown || button == 2)
+			{
+				_isDown = false;
+				if (_points.length >= 10)
+				{
+					var result = _r.Recognize(_points, document.getElementById('useProtractor').checked);
+					drawText("Result: " + result.Name + " (" + round(result.Score,2) + ") in " + result.Time + " ms.");
+				}
+				else // fewer than 10 points were inputted
+				{
+					drawText("Too few points made. Please try again.");
+				}
+			}
+		}
+		function drawText(str)
+		{
+			_g.fillStyle = "rgb(255,255,136)";
+			_g.fillRect(0, 0, _rc.width, 20);
+			_g.fillStyle = "rgb(0,0,255)";
+			_g.fillText(str, 1, 14);
+		}
+		function drawConnectedPoint(from, to)
+		{
+			_g.beginPath();
+			_g.moveTo(_points[from].X, _points[from].Y);
+			_g.lineTo(_points[to].X, _points[to].Y);
+			_g.closePath();
+			_g.stroke();
+		}
+		function round(n, d) // round 'n' to 'd' decimals
+		{
+			d = Math.pow(10, d);
+			return Math.round(n * d) / d;
+		}
+		//
+		// Unistroke Adding and Clearing
+		//
+		function onClickAddExisting()
+		{
+			if (_points.length >= 10)
+			{
+				var unistrokes = document.getElementById('unistrokes');
+				var name = unistrokes[unistrokes.selectedIndex].value;
+				var num = _r.AddGesture(name, _points);
+				drawText("\"" + name + "\" added. No. of \"" + name + "\" defined: " + num + ".");
+			}
+		}
+		function onClickAddCustom()
+		{
+			var name = document.getElementById('custom').value;
+			if (_points.length >= 10 && name.length > 0)
+			{
+				var num = _r.AddGesture(name, _points);
+				drawText("\"" + name + "\" added. No. of \"" + name + "\" defined: " + num + ".");
+			}
+		}
+		function onClickCustom()
+		{
+			document.getElementById('custom').select();
+		}
+		function onClickDelete()
+		{
+			var num = _r.DeleteUserGestures(); // deletes any user-defined unistrokes
+			alert("All user-defined gestures have been deleted. Only the 1 predefined gesture remains for each of the " + num + " types.");
+		}
+	// -->
+	</script>
+</head>
+<body onload="onLoadEvent()">
+	
+
+	
+	<div id="Content">
+		
+
+		<p class="subhead">Demo</p>
+		<p>
+			In the demo below, only one unistroke template is loaded for each of the 16 gesture types. You can add additional
+			unistrokes as you wish, and even define your own custom unistrokes.
+			<!-- Gesture image and canvas -->
+			<table border="0" cellspacing="10">
+				<tr>
+					<td valign="top">
+						<img src="unistrokes.gif"><br/>
+						<p>
+							<form style="font-size:10pt">
+								<input type="radio" name="search" id="useGSS" checked>
+									<span style="font-weight:bold">Use Golden Section Search <i>(original)</i></span>
+								</input><br />
+								<input type="radio" name="search" id="useProtractor">
+									<span style="font-weight:bold">Use Protractor <i>(faster)</i></span>
+								</input>
+							</form>
+						</p>
+					</td>
+					<td valign="top" align="left">
+						<p style="margin-bottom:4pt;font-size:10pt"><i>Make strokes on this canvas. If a misrecognition occurs,
+						add the misrecognized unistroke as an example of the intended gesture.</i>
+						</p>
+
+						<canvas id="myCanvas" width="420" height="400" style="background-color:#dddddd"
+								onmousedown="mouseDownEvent(event.clientX, event.clientY, event.button)"
+								onmousemove="mouseMoveEvent(event.clientX, event.clientY, event.button)"
+								onmouseup="mouseUpEvent(event.clientX, event.clientY, event.button)"
+								oncontextmenu="return false;">
+							<span style="background-color:#ffff88;">The &lt;canvas&gt; element is not supported by this browser.</span>
+						</canvas>
+
+						<!-- Editing area below stroking canvas area -->
+						<table border="0" width="420" style="font-size:10pt">
+							<tr>
+								<td valign="top" align="left">Add as example of existing type:</td>
+								<td valign="top" align="right">
+									<select id="unistrokes" style="width:136px" onkeypress="if (event.keyCode == 13) onClickAddExisting()">
+										<option selected value="triangle">triangle</option>
+										<option value="x">x</option>
+										<option value="rectangle">rectangle</option>
+										<option value="circle">circle</option>
+										<option value="check">check</option>
+										<option value="caret">caret</option>
+										<option value="zig-zag">zig-zag</option>
+										<option value="arrow">arrow</option>
+										<option value="left square bracket">left square bracket</option>
+										<option value="right square bracket">right square bracket</option>
+										<option value="v">v</option>
+										<option value="delete">delete</option>
+										<option value="left curly brace">left curly brace</option>
+										<option value="right curly brace">right curly brace</option>
+										<option value="star">star</option>
+										<option value="pigtail">pigtail</option>
+									</select>
+								</td>
+								<td valign="top" align="right"><input type="button" style="width:64px" value="  Add   " onclick="onClickAddExisting()" /></td>
+							</tr>
+							<tr>
+								<td valign="top" align="left">Add as example of custom type:</td>
+								<td valign="top" align="right"><input type="text" id="custom" style="width:130px" value="Type name here..." onclick="onClickCustom()" onkeypress="if (event.keyCode == 13) onClickAddCustom()" /></td>
+								<td valign="top" align="right"><input type="button" style="width:64px" value="  Add   " onclick="onClickAddCustom()" /></td>
+							</tr>
+							<tr>
+								<td valign="top" align="left">Delete all user-defined gestures:</td>
+								<td valign="top" align="right">&nbsp;</td>
+								<td valign="top" align="right"><input type="button" style="width:64px" value="Delete" onclick="onClickDelete()" /></td>
+							</tr>
+						</table>
+						<!-- End of editing area below stroking canvas area -->
+					</td>
+				</tr>
+			</table>
+		</p>
+
+		
+
+	</div>
+</body>
+</html>
