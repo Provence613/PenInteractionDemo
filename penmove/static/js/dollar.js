@@ -346,6 +346,10 @@ function Distance(p1, p2)
 	var dy = p2.Y - p1.Y;
 	return Math.sqrt(dx * dx + dy * dy);
 }
-function Deg2Rad(d) { 
-	return (d * Math.PI / 180.0); 
+function Deg2Rad(d) {
+	return (d * Math.PI / 180.0);
+}
+
+export {
+  DollarRecognizer,Point
 }
