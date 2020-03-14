@@ -3,13 +3,35 @@
     <el-container>
       <el-header>Define Your Posture  <input type="radio" name="search" id="useProtractor" style="opacity: 0;"></el-header>
       <el-main>
-        <canvas id="myCanvas" width="600" height="250" style="display: block;background-color:#dddddd"
-                       @touchstart="touchstartEvent"
-                       @touchmove="touchmoveEvent"
-                       @touchend="touchendEvent"
-                       oncontextmenu="return false;">
-        <span style="background-color:#ffff88;">The &lt;canvas&gt; element is not supported by this browser.</span>
-      </canvas>
+<!--        <div style="margin-bottom: 10px">-->
+<!--          <el-row :gutter="12">-->
+<!--            <el-col :span="8">-->
+<!--              <el-card shadow="always" style="background-color: #B3C0D1; font-family: bold">-->
+<!--                1.Define Your Posture-->
+<!--              </el-card>-->
+<!--            </el-col>-->
+<!--            <el-col :span="8">-->
+<!--              <el-card shadow="always" style="background-color: #B3C0D1;font-family: bold">-->
+<!--                2.Use Your Posture-->
+<!--              </el-card>-->
+<!--            </el-col>-->
+<!--            <el-col :span="8">-->
+<!--              <el-card shadow="always" style="background-color: #B3C0D1;font-family: bold">-->
+<!--                3.Page Jump-->
+<!--              </el-card>-->
+<!--            </el-col>-->
+<!--          </el-row>-->
+<!--        </div>-->
+
+        <div style="width: 100%;height:100%;margin:0;padding:0;">
+          <canvas id="myCanvas" width="800" height="400" style="width: 100%;height:100%;margin:0;padding:0;display: block;background-color:#dddddd;"
+                  @touchstart="touchstartEvent"
+                  @touchmove="touchmoveEvent"
+                  @touchend="touchendEvent"
+                  oncontextmenu="return false;">
+            <span style="background-color:#ffff88;">The &lt;canvas&gt; element is not supported by this browser.</span>
+          </canvas>
+        </div>
 <!--        <div class="demo-input-suffix"style="margin-top:20px ">-->
 <!--          Add as example of existing type:-->
 <!--          <el-select id="unistrokes" v-model="value" placeholder="Please Choose" style="width: 150px">-->
@@ -23,10 +45,30 @@
 <!--          <el-button type="primary" round @click="onClickAddExisting">ADD</el-button>-->
 <!--        </div>-->
         <div class="demo-input-suffix" style="margin-top:10px " >
-          <el-input placeholder="Type name here..." style="width: 200px" v-model="input1" id="custom" @click="onClickCustom" >
-          </el-input>
-          <el-button type="primary" icon="el-icon-edit" @click="onClickAddCustom" circle></el-button>
-          <el-button type="primary" icon="el-icon-delete" @click="onClickDelete" circle></el-button>
+          <el-row>
+            <el-slider v-model="valueLineWidth" :min="1" :max="8" show-input @change="changeLineWidth"></el-slider>
+          </el-row>
+          <el-row >
+            <el-button style="background-color: blue" circle @click="changePenColor('blue')"></el-button>
+            <el-button style="background-color: #42b983" circle  @click="changePenColor('#42b983')"></el-button>
+            <el-button style="background-color: #ffff88" circle  @click="changePenColor('#ffff88')"></el-button>
+            <el-button style="background-color: orange" circle  @click="changePenColor('orange')"></el-button>
+            <el-button style="background-color: peachpuff" circle  @click="changePenColor('peachpuff')"></el-button>
+            <el-button style="background-color: plum" circle  @click="changePenColor('plum')"></el-button>
+<!--            Define Your Pen Color-->
+<!--            <el-color-picker-->
+<!--              v-model="color"-->
+<!--              show-alpha-->
+<!--              :predefine="predefineColors">-->
+<!--            </el-color-picker>-->
+          </el-row>
+          <el-row style="margin-top: 15px">
+            <el-input placeholder="Type name here..." style="width: 200px" v-model="input1" id="custom" @click="onClickCustom" >
+            </el-input>
+            <el-button type="primary" icon="el-icon-edit" @click="onClickAddCustom" circle></el-button>
+            <el-button type="primary" icon="el-icon-delete" @click="onClickDelete" circle></el-button>
+          </el-row>
+
         </div>
       </el-main>
     </el-container>
@@ -41,6 +83,23 @@ export default {
     return {
       msg: 'Welcome to Your Vue.js App',
       input1:'',
+      color: 'blue',
+      predefineColors: [
+        '#ff4500',
+        '#ff8c00',
+        '#ffd700',
+        '#90ee90',
+        '#00ced1',
+        '#1e90ff',
+        '#c71585',
+        'rgba(255, 69, 0, 0.68)',
+        'rgb(255, 120, 0)',
+        'hsv(51, 100, 98)',
+        'hsva(120, 40, 94, 0.5)',
+        'hsl(181, 100%, 37%)',
+        'hsla(209, 100%, 56%, 0.73)',
+        '#c7158577'
+      ],
       options: [{
         value: 'triangle',
         label: 'triangle'
@@ -91,6 +150,7 @@ export default {
         label: 'pigtail'
       }],
       value:'',
+      valueLineWidth:3,
       _isDown:null,
       _points:null,
       _r:null,
@@ -112,6 +172,12 @@ export default {
       this._g.fillStyle = "rgb(255,255,136)";
       this._g.fillRect(0, 0, this._rc.width, 20);
       this._isDown = false;
+    },
+    changeLineWidth:function(){
+      this._g.lineWidth=this.valueLineWidth;
+    },
+    changePenColor:function(color){
+      this._g.strokeStyle=color;
     },
     getCanvasRect:function (canvas) {
       var w = canvas.width;

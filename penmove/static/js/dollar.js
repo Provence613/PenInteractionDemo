@@ -171,6 +171,8 @@ function DollarRecognizer() // constructor
 	this.AddGesture = function(name, points)
 	{
 		this.Unistrokes[this.Unistrokes.length] = new Unistroke(name, points); // append new unistroke
+    // console.log(name);
+    // console.log(points)
 		var num = 0;
 		for (var i = 0; i < this.Unistrokes.length; i++) {
 			if (this.Unistrokes[i].Name == name)
