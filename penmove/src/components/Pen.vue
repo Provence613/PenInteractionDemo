@@ -24,7 +24,7 @@
 <!--        </div>-->
 
         <div style="width: 100%;height:100%;margin:0;padding:0;">
-          <canvas id="myCanvas" width="800" height="400" style="width: 100%;height:100%;margin:0;padding:0;display: block;background-color:#dddddd;"
+          <canvas class="myCanvasclass" id="myCanvas" width="800" height="400" style="width: 100%;height:100%;margin:0;padding:0;display: block;background-color:#dddddd;"
                   @touchstart="touchstartEvent"
                   @touchmove="touchmoveEvent"
                   @touchend="touchendEvent"
@@ -208,6 +208,7 @@ export default {
     // Touch Events
     //
     touchstartEvent:function (event) {
+      event.preventDefault();
       var x=event.touches[0].clientX;
       var y=event.touches[0].clientY;
       this._isDown = true;
@@ -221,6 +222,7 @@ export default {
       this._g.fillRect(x - 4, y - 3, 9, 9);
     },
     touchmoveEvent:function(event) {
+      event.preventDefault();
       var x=event.touches[0].clientX;
       var y=event.touches[0].clientY;
       console.log(this._isDown);
@@ -230,8 +232,10 @@ export default {
         this._points[this._points.length] = new Point(x, y); // append
         this.drawConnectedPoint(this._points.length - 2, this._points.length - 1);
       }
+
   },
     touchendEvent:function () {
+      event.preventDefault();
       if (this._isDown) {
         this._isDown = false;
         if (this._points.length >= 10) {
