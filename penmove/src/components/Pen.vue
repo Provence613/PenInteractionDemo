@@ -164,8 +164,8 @@ export default {
       this._r = new DollarRecognizer();
       var canvas = document.getElementById('myCanvas');
       this._g = canvas.getContext('2d');
-      this._g.fillStyle = "rgb(0,0,225)";
-      this._g.strokeStyle = "rgb(0,0,225)";
+      this._g.fillStyle =this.color;
+      this._g.strokeStyle = this.color;
       this._g.lineWidth = 3;
       this._g.font = "16px Gentilis";
       this._rc = this.getCanvasRect(canvas); // canvas rect on page
@@ -177,6 +177,7 @@ export default {
       this._g.lineWidth=this.valueLineWidth;
     },
     changePenColor:function(color){
+      this.color=color;
       this._g.strokeStyle=color;
     },
     getCanvasRect:function (canvas) {
