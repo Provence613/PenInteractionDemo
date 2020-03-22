@@ -1,8 +1,8 @@
 <template>
-  <div class="hello">
-    <el-container>
-      <el-header>Define Your Posture  <input type="radio" name="search" id="useProtractor" style="opacity: 0;"></el-header>
-      <el-main>
+  <div class="hello" style="height: 100%">
+    <el-container style="height: 100%">
+      <el-header style="height: 8%">手势跳转由你定义  <input type="radio" name="search" id="useProtractor" style="opacity: 0;"></el-header>
+      <el-main style="height: 60%;">
 <!--        <div style="margin-bottom: 10px">-->
 <!--          <el-row :gutter="12">-->
 <!--            <el-col :span="8">-->
@@ -24,7 +24,7 @@
 <!--        </div>-->
 
         <div style="width: 100%;height:100%;margin:0;padding:0;">
-          <canvas class="myCanvasclass" id="myCanvas" width="800" height="400" style="width: 100%;height:100%;margin:0;padding:0;display: block;background-color:#dddddd;"
+          <canvas class="myCanvasclass" id="myCanvas" width="800" height="600" style="border-radius:10px; box-shadow: darkgrey 5px 10px 10px 5px; width: 100%;height:100%;margin:0;padding:0;display: block;background-color:#ffffff;"
                   @touchstart="touchstartEvent"
                   @touchmove="touchmoveEvent"
                   @touchend="touchendEvent"
@@ -44,7 +44,10 @@
 <!--          </el-select>-->
 <!--          <el-button type="primary" round @click="onClickAddExisting">ADD</el-button>-->
 <!--        </div>-->
-        <div class="demo-input-suffix" style="margin-top:10px " >
+
+      </el-main>
+      <el-main style="height: 30%">
+        <div class="demo-input-suffix" style="margin-top:10px;height: 100%" >
           <el-row>
             <el-slider v-model="valueLineWidth" :min="1" :max="8" show-input @change="changeLineWidth"></el-slider>
           </el-row>
@@ -55,18 +58,21 @@
             <el-button style="background-color: orange" circle  @click="changePenColor('orange')"></el-button>
             <el-button style="background-color: peachpuff" circle  @click="changePenColor('peachpuff')"></el-button>
             <el-button style="background-color: plum" circle  @click="changePenColor('plum')"></el-button>
-<!--            Define Your Pen Color-->
-<!--            <el-color-picker-->
-<!--              v-model="color"-->
-<!--              show-alpha-->
-<!--              :predefine="predefineColors">-->
-<!--            </el-color-picker>-->
+            <!--            Define Your Pen Color-->
+            <!--            <el-color-picker-->
+            <!--              v-model="color"-->
+            <!--              show-alpha-->
+            <!--              :predefine="predefineColors">-->
+            <!--            </el-color-picker>-->
           </el-row>
           <el-row style="margin-top: 15px">
-            <el-input placeholder="Type name here..." style="width: 200px" v-model="input1" id="custom" @click="onClickCustom" >
-            </el-input>
-            <el-button type="primary" icon="el-icon-edit" @click="onClickAddCustom" circle></el-button>
-            <el-button type="primary" icon="el-icon-delete" @click="onClickDelete" circle></el-button>
+<!--            <el-input placeholder="Type name here..." style="width: 200px" v-model="input1" id="custom" @click="onClickCustom" >-->
+<!--            </el-input>-->
+            <el-select v-model="value" placeholder="选择应用" id="custom" style="width:90%">
+            <el-option v-for="item in optionsApp" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            </el-select>
+            <el-button type="primary" icon="el-icon-edit" @click="onClickAddCustom" >添加手势</el-button>
+            <el-button type="primary" icon="el-icon-delete"  @click="onClickDelete" >删除手势</el-button>
           </el-row>
 
         </div>
@@ -84,6 +90,22 @@ export default {
       msg: 'Welcome to Your Vue.js App',
       input1:'',
       color: 'blue',
+      optionsApp: [{
+        value: 'alipay://',
+        label: '支付宝'
+      }, {
+        value: 'taobao://',
+        label: '淘宝'
+      }, {
+        value: 'weixin://',
+        label: '微信'
+      }, {
+        value: 'sinaweibo://',
+        label: '打电话'
+      }, {
+        value: 'zhihu://',
+        label: '知乎'
+      }],
       predefineColors: [
         '#ff4500',
         '#ff8c00',
@@ -169,8 +191,8 @@ export default {
       this._g.lineWidth = 3;
       this._g.font = "16px Gentilis";
       this._rc = this.getCanvasRect(canvas); // canvas rect on page
-      this._g.fillStyle = "rgb(255,255,136)";
-      this._g.fillRect(0, 0, this._rc.width, 20);
+      // this._g.fillStyle = "rgb(255,255,136)";
+      // this._g.fillRect(0, 0, this._rc.width, 20);
       this._isDown = false;
     },
     changeLineWidth:function(){
@@ -178,7 +200,7 @@ export default {
     },
     changePenColor:function(color){
       this.color=color;
-      this._g.strokeStyle=color;
+      this._g.strokeStyle=this.color;
     },
     getCanvasRect:function (canvas) {
       var w = canvas.width;
@@ -219,7 +241,7 @@ export default {
         this._g.clearRect(0, 0, this._rc.width, this._rc.height);
       this._points.length = 1; // clear
       this._points[0] = new Point(x, y);
-      this.drawText("Recording unistroke...");
+    //  this.drawText("Recording unistroke...");
       this._g.fillRect(x - 4, y - 3, 9, 9);
     },
     touchmoveEvent:function(event) {
@@ -241,11 +263,13 @@ export default {
         this._isDown = false;
         if (this._points.length >= 10) {
           var result = this._r.Recognize(this._points, document.getElementById('useProtractor').checked);
-          this.drawText("Result: " + result.Name + " (" + this.round(result.Score,2) + ") in " + result.Time + " ms.");
+       //   this.drawText("Result: " + result.Name + " (" + this.round(result.Score,2) + ") in " + result.Time + " ms.");
+          console.log(result.Name);
           if(/\./.test(result.Name)){
             console.log(result.Name);
             window.location.href="http://"+result.Name;
-          }
+          }else if(result.Name.indexOf("/") != -1 )
+            window.location.href = result.Name;
         } else // fewer than 10 points were inputted
         {
           this.drawText("Too few points made. Please try again.");
@@ -281,10 +305,18 @@ export default {
       }
     },
     onClickAddCustom:function () {
-      var name = document.getElementById('custom').value;
+      var name = document.getElementById("custom").value;
+      var url="";
+      if(name=='淘宝')url="taobao://"
+      if(name=='微信')url="weixin://"
+      if(name=='打电话')url="tel://"+prompt("请输入电话号码：");
+      if(name=='知乎')url="zhihu://"
+      if(name=='支付宝')url="alipay://"
       if (this._points.length >= 10 && name.length > 0) {
-        var num = this._r.AddGesture(name, this._points);
-        this.drawText("\"" + name + "\" added. No. of \"" + name + "\" defined: " + num + ".");
+        var num = this._r.AddGesture(url, this._points);
+        this.drawText(
+          '"' + name + '" added. No. of "' + name + '" defined: ' + num + "."
+        );
       }
     },
     onClickCustom:function () {
@@ -318,18 +350,18 @@ a {
   color: #42b983;
 }
  .el-header{
-   background-color: #B3C0D1;
-   color: #333;
+   background-color: black;
+   color: #ffffff;
    text-align: center;
    line-height: 60px;
    font-size: 20px;
-   color: #362c22;
+   font-family: "Arial Black";
    font-weight: bold;
  }
 
 
 .el-main {
-  background-color: #E9EEF3;
+  /*background-color: #E9EEF3;*/
   color: #333;
   text-align: center;
   line-height: 40px;
