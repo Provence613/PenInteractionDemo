@@ -105,6 +105,18 @@ export default {
       }, {
         value: 'zhihu://',
         label: '知乎'
+      },{
+        value: 'weixin://scanqrcode',
+        label: '扫一扫'
+      }, {
+        value: 'alipay://platformapi/startapp?appId=20000056',
+        label: '付款码'
+      },{
+        value: 'alipay://platformapi/startapp?appId=60000002',
+        label: '蚂蚁森林'
+      },{
+        value: 'orpheuswidget://recognize',
+        label: '听歌识曲'
       }],
       predefineColors: [
         '#ff4500',
@@ -312,6 +324,10 @@ export default {
       if(name=='打电话')url="tel://"+prompt("请输入电话号码：");
       if(name=='知乎')url="zhihu://"
       if(name=='支付宝')url="alipay://"
+      if (name == '扫一扫') url = 'weixin://scanqrcode';
+      if (name == '付款码') url = 'alipay://platformapi/startapp?appId=20000056';
+      if (name == '蚂蚁森林') url = 'alipay://platformapi/startapp?appId=60000002';
+      if (name == '听歌识曲') url = 'orpheuswidget://recognize';
       if (this._points.length >= 10 && name.length > 0) {
         var num = this._r.AddGesture(url, this._points);
         this.drawText(
